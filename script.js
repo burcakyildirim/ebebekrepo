@@ -1,229 +1,482 @@
 (() => {
-    const isHomePage = () => {
-        const currentURL = window.location.href;
-        return currentURL === "https://www.e-bebek.com" || currentURL === "https://www.e-bebek.com/";
-    };
+  const isHomePage = () => {
+    const currentURL = window.location.href;
+    return (
+      currentURL === "https://www.e-bebek.com" ||
+      currentURL === "https://www.e-bebek.com/"
+    );
+  };
 
-    if (!isHomePage()) {
-        console.log("wrong page");
-        return;
-    }
+  if (!isHomePage()) {
+    console.log("wrong page");
+    return;
+  }
 
-    const init = () => {
-        buildHTML();
-        buildCSS();
-        fetchProducts();
-    };
+  const init = () => {
+    buildHTML();
+    buildCSS();
+    fetchProducts();
+  };
 
-    const buildHTML = () => {
-        const targetElement = document.querySelector(".Section1");
-        if (!targetElement) return;
+  const buildHTML = () => {
+    const targetElement = document.querySelector(".Section1");
+    if (!targetElement) return;
 
-        const carouselHTML = `
-            <div id="ebebek-carousel">
-                <h1>Beğenebileceğinizi Düşündüklerimiz</h1>
-                <div class="carousel-container">
-                    <button id="prevBtn">←</button>
-                    <div class="products-wrapper">
-                        <div class="products-track"></div>
-                    </div>
-                    <button id="nextBtn">→</button>
+    const carouselHTML = `
+    <div id="ebebek-carousel">
+        <h1>Beğenebileceğiniz Ürünler</h1>
+        <button id="prevBtn"><</button>
+        <div class="carousel-container">
+            <div class="products-wrapper">
+                <div class="products-track">
+                    <!-- Kartlar burada olacak -->
                 </div>
             </div>
+        </div>
+        <button id="nextBtn">></button>
+    </div>
+      `;
+
+    targetElement.insertAdjacentHTML("afterend", carouselHTML);
+  };
+
+  const buildCSS = () => {
+    const css = `
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+#ebebek-carousel {
+    max-width: 1300px;
+    margin: 20px auto;
+    position: relative;
+    font-family: Poppins, "cursive";
+}
+
+#ebebek-carousel h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #F18E00;
+    background-color: #FEF6EB;
+    padding: 25px 67px;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
+    text-align: left;
+    width: 100%; 
+    margin: 20px auto;
+}
+
+.carousel-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    max-width: 1200px;
+    margin:0 auto;
+    padding: 0;
+    overflow: hidden;
+}
+
+.products-wrapper {
+    width: calc(290px * 4); 
+    overflow: hidden;
+    position: relative;
+}
+
+.products-track {
+    display: flex;
+    gap: 10px;
+    transition: transform 0.5s ease;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    align-items: center;
+    min-width: 260px;
+    min-height: 500px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: left; 
+    background: #fff;
+    color: #7D7D7D;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    width: 100%;
+    padding: 20px;
+    gap: 15px; 
+    flex-grow: 1; 
+}
+
+.product-info h3,
+.product-info .price-wrapper,
+.product-info .discount {
+    text-align: left;
+    width: 100%;
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px; 
+    object-fit: contain; 
+    border-radius: 5px;
+}
+
+.product-card h3 {
+    font-size: 12px;
+    margin: 10px 0;
+    height: 50px; 
+    overflow: hidden; 
+    display: flex;
+    align-items: center; 
+    text-align: left;
+}
+
+.add-to-cart {
+    display: block;
+    margin-top: auto; 
+    width: 100%;
+    height: 50px;
+    padding: 10px;
+    border: none;
+    border-radius: 50px;
+    background-color: #FFF7EC;
+    color: #FE8800;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-size: 16px;
+}
+
+.add-to-cart:hover {
+    background-color: #FE8800;
+    color: white;
+}
+
+.price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.price-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.old-price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap; 
+}
+
+.old-price {
+    font-size: 24px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.discount {
+    font-size: 24px;
+    color: #00A364;
+    font-weight: bold;
+}
+
+.discounted-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00A364;
+    margin-top: 5px;
+    display: block;
+}
+
+.price {
+    font-size: 24px;
+}
+
+#prevBtn, #nextBtn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    background: #FEF6EBcc;
+    color: #F18E00;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 18px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#prevBtn {
+    left: -60px; 
+}
+
+#nextBtn {
+    right: -60px; 
+}
+
+#prevBtn:hover, #nextBtn:hover {
+    background: #FFFFFFe6;
+    opacity: 1;
+}
+
+.product-card {
+    position: relative;
+    width: 250px;
+    height: 350px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #EDEDED; 
+    transition: border 0.3s ease-in-out;
+}
+
+.product-card:hover {
+    border-color: #FE8800; 
+}
+
+.heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.heart:hover {
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.25); 
+}
+
+.heart img {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.heart .hover-img {
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+}
+
+.heart:hover .hover-img {
+    opacity: 1;
+}
+
+.heart:hover .default-img {
+    opacity: 0;
+}
+
+
+.heart.active {
+    background-color: orange;
+}
+
+.heart.active .hover-img {
+    opacity: 0;
+}
         `;
+    const styleTag = document.createElement("style");
+    styleTag.innerHTML = css;
+    document.head.appendChild(styleTag);
+  };
 
-        targetElement.insertAdjacentHTML("afterend", carouselHTML);
-    };
+  const LOCAL_STORAGE_KEY = "favoriteProducts";
 
-    const buildCSS = () => {
-        const css = `
-            #ebebek-carousel {
-                max-width: 1200px;
-                margin: 20px auto;
-                padding: 10px;
-                text-align: center;
-                position: relative;
-            }
+  
+  const saveFavoritesToLocalStorage = (favorites) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(favorites));
+  };
 
-            h1 {
-                font-size: 24px;
-                margin-bottom: 20px;
-            }
+  
+  const getFavoritesFromLocalStorage = () => {
+    const storedFavorites = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return storedFavorites ? JSON.parse(storedFavorites) : [];
+  };
 
-            .carousel-container {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: relative;
-                max-width: 1200px;
-                overflow: hidden;
-            }
+  
+  const fetchProducts = async () => {
+    try {
+      let products;
+      const storedProducts = localStorage.getItem("products");
 
-            .products-wrapper {
-                width: 960px;
-                overflow: hidden;
-                position: relative;
-            }
+      if (storedProducts) {
+        products = JSON.parse(storedProducts);
+      } else {
+        const response = await fetch(
+          "https://gist.githubusercontent.com/sevindi/8bcbde9f02c1d4abe112809c974e1f49/raw/9bf93b58df623a9b16f1db721cd0a7a539296cf0/products.json"
+        );
+        if (!response.ok) throw new Error("Ürünleri çekerken hata oluştu.");
 
-            .products-track {
-                display: flex;
-                gap: 10px;
-                transition: transform 0.5s ease;
-            }
+        products = await response.json();
+        localStorage.setItem("products", JSON.stringify(products)); 
+      }
 
-            .product-card {
-                min-width: 280px;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                text-align: center;
-                background: #fff;
-                position: relative; /* Kalp için */
-            }
+      renderProducts(products);
+    } catch (error) {
+      console.error("API Hatası:", error);
+    }
+  };
 
-            .product-card img {
-                width: 100%;
-                height: auto;
-                border-radius: 5px;
-            }
+  
+  const renderProducts = (products) => {
+    const track = document.querySelector(".products-track");
+    if (!track) return;
 
-            .product-card h3 {
-                font-size: 16px;
-                margin: 10px 0;
-            }
+    track.innerHTML = "";
 
-            .price-wrapper {
-                font-size: 14px;
-                margin-top: 5px;
-            }
+    const favoriteProducts = getFavoritesFromLocalStorage();
 
-            .discount {
-                color: red;
-                font-weight: bold;
-            }
+    products.forEach((product) => {
+      const isFavorite = favoriteProducts.includes(product.id); 
+      const heartClass = isFavorite ? "active" : ""; 
 
-            #prevBtn, #nextBtn {
-                background: rgba(0, 123, 255, 0.8);
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                cursor: pointer;
-                font-size: 18px;
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 100;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 1;
-                transition: background 0.3s ease, opacity 0.3s ease;
-            }
+      let priceHTML = `<span class="price">${product.price.toFixed(
+        2
+      )} TL</span>`;
 
-            #prevBtn {
-                left: 10px;
-            }
+      if (product.original_price > product.price) {
+        const discountPercent = Math.round(
+          100 - (product.price / product.original_price) * 100
+        );
+        priceHTML = `
+                  <div class="price-container">
+                      <div class="old-price-wrapper">
+                          <del class="old-price">${product.original_price.toFixed(
+                            2
+                          )} TL</del> 
+                          <span class="discount">%${discountPercent}</span>
+                      </div>
+                      <span class="discounted-price">${product.price.toFixed(
+                        2
+                      )} TL</span>
+                  </div>
+              `;
+      }
 
-            #nextBtn {
-                right: 10px;
-            }
+      const productHTML = `
+              <div class="product-card" data-id="${product.id}">
+                  <div class="heart ${heartClass}">
+                      <img class="default-img" src="https://www.e-bebek.com/assets/svg/default-favorite.svg" alt="Favorite" />
+                      <img class="hover-img" src="https://www.e-bebek.com/assets/svg/default-hover-favorite.svg" alt="Favorite Hover" />
+                  </div>
+                  <img src="${product.img}" alt="${product.name}" onclick="window.open('${product.url}', '_blank')" />
+                  <div class="product-info">
+                      <h3 onclick="window.open('${product.url}', '_blank')">${product.name}</h3>
+                      <div class="price-wrapper">
+                          ${priceHTML}
+                      </div>
+                      <button class="add-to-cart">Sepete Ekle</button>
+                  </div>
+              </div>
+          `;
 
-            #prevBtn:hover, #nextBtn:hover {
-                background: rgba(0, 86, 179, 0.9);
-                opacity: 1;
-            }
+      track.insertAdjacentHTML("beforeend", productHTML);
+    });
 
-            /* 🔥 Kalp Butonu İçin */
-            .favorite-btn {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                width: 30px;
-                height: 30px;
-                background: url("https://www.e-bebek.com/assets/svg/default-favorite.svg") no-repeat center;
-                background-size: cover;
-                border: none;
-                cursor: pointer;
-            }
+    addHeartFunctionality();
+    addCarouselFunctionality();
+  };
 
-            .favorite-btn:hover {
-                background-image: url("https://www.e-bebek.com/assets/svg/default-hover-favorite.svg");
-            }
-        `;
+  
+  const addHeartFunctionality = () => {
+    const hearts = document.querySelectorAll(".heart");
+    const storedFavorites =
+      JSON.parse(localStorage.getItem("favoriteProducts")) || [];
 
-        const styleTag = document.createElement("style");
-        styleTag.innerHTML = css;
-        document.head.appendChild(styleTag);
-    };
+    hearts.forEach((heart) => {
+      const productName = heart
+        .closest(".product-card")
+        .querySelector("h3").textContent;
 
-    const fetchProducts = async () => {
-        try {
-            const response = await fetch("https://gist.githubusercontent.com/sevindi/8bcbde9f02c1d4abe112809c974e1f49/raw/9bf93b58df623a9b16f1db721cd0a7a539296cf0/products.json");
-            if (!response.ok) throw new Error("Ürünleri çekerken hata oluştu.");
+      
+      if (storedFavorites.includes(productName)) {
+        heart.classList.add("active");
+      }
 
-            const data = await response.json();
-            renderProducts(data);
-        } catch (error) {
-            console.error("API Hatası:", error);
+      heart.addEventListener("click", () => {
+        heart.classList.toggle("active");
+        let updatedFavorites =
+          JSON.parse(localStorage.getItem("favoriteProducts")) || [];
+
+        if (heart.classList.contains("active")) {
+          updatedFavorites.push(productName);
+        } else {
+          updatedFavorites = updatedFavorites.filter(
+            (item) => item !== productName
+          );
         }
-    };
 
-    const renderProducts = (products) => {
-        const track = document.querySelector(".products-track");
-        if (!track) return;
+        localStorage.setItem(
+          "favoriteProducts",
+          JSON.stringify(updatedFavorites)
+        );
+      });
+    });
+  };
+  const addCarouselFunctionality = () => {
+    const track = document.querySelector(".products-track");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
 
-        products.forEach(product => {
-            const discount = product.original_price > product.price
-                ? `<span class="discount">%${Math.round(100 - (product.price / product.original_price) * 100)} indirim!</span>`
-                : "";
+    if (!track || !prevBtn || !nextBtn) return;
 
-            const productHTML = `
-                <div class="product-card">
-                    <button class="favorite-btn"></button>
-                    <img src="${product.img}" alt="${product.name}" onclick="window.open('${product.url}', '_blank')" />
-                    <h3 onclick="window.open('${product.url}', '_blank')">${product.name}</h3>
-                    <div class="price-wrapper">
-                        <span class="price">${product.price.toFixed(2)} TL</span>
-                        ${product.original_price > product.price ? `<del>${product.original_price.toFixed(2)} TL</del>` : ""}
-                        ${discount}
-                    </div>
-                </div>
-            `;
+    let position = 0;
+    const cardWidth = document.querySelector(".product-card").offsetWidth + 10;
+    const totalCards = document.querySelectorAll(".product-card").length;
+    const containerWidth =
+      document.querySelector(".products-wrapper").offsetWidth;
+    const visibleCards = Math.floor(containerWidth / cardWidth);
+    const maxPosition = -((totalCards - visibleCards) * cardWidth);
 
-            track.insertAdjacentHTML("beforeend", productHTML);
-        });
+    
+    if (totalCards <= visibleCards) {
+      prevBtn.style.display = "none";
+      nextBtn.style.display = "none";
+      return;
+    } else {
+      prevBtn.style.display = "block";
+      nextBtn.style.display = "block";
+    }
 
-        addCarouselFunctionality();
-    };
+    nextBtn.addEventListener("click", () => {
+      if (position - cardWidth >= maxPosition) {
+        position -= cardWidth;
+        track.style.transform = `translateX(${position}px)`;
+      }
+    });
 
-    const addCarouselFunctionality = () => {
-        const track = document.querySelector(".products-track");
-        const prevBtn = document.getElementById("prevBtn");
-        const nextBtn = document.getElementById("nextBtn");
+    prevBtn.addEventListener("click", () => {
+      if (position + cardWidth <= 0) {
+        position += cardWidth;
+        track.style.transform = `translateX(${position}px)`;
+      }
+    });
+  };
 
-        let position = 0;
-        const cardWidth = 250; // 240px + margin/gap
-        const visibleCards = 4;
-        const totalCards = document.querySelectorAll(".product-card").length;
-        const maxPosition = -(totalCards - visibleCards) * cardWidth;
-
-        prevBtn.addEventListener("click", () => {
-            if (position < 0) {
-                position += cardWidth;
-                track.style.transform = `translate3d(${position}px, 0, 0)`;
-            }
-        });
-
-        nextBtn.addEventListener("click", () => {
-            if (position > maxPosition) {
-                position -= cardWidth;
-                track.style.transform = `translate3d(${position}px, 0, 0)`;
-            }
-        });
-    };
-
-    init();
+  init();
 })();
