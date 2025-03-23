@@ -44,23 +44,27 @@
     const css = `
     @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 #ebebek-carousel {
-    max-width: 1300px;
-    margin: 20px auto;
+    max-width: 1320px;
+    margin:20px auto;
     position: relative;
     font-family: Poppins, "cursive";
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 35px;
 }
 
 #ebebek-carousel h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #F18E00;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.11;
+    color: #F28E00;
     background-color: #FEF6EB;
     padding: 25px 67px;
     border-top-left-radius: 35px;
     border-top-right-radius: 35px;
     text-align: left;
     width: 100%; 
-    margin: 20px auto;
+    margin:0 auto 20px auto;
+    font-family: Quicksand-Bold;
 }
 
 .carousel-container {
@@ -179,27 +183,29 @@
 }
 
 .old-price {
-    font-size: 24px;
+    font-size: 1.4rem;
+    font-weight: 500;
     color: #999;
     text-decoration: line-through;
 }
 
 .discount {
-    font-size: 24px;
-    color: #00A364;
-    font-weight: bold;
+    font-size: 18px;
+    color: #00A365;
+    font-weight: 700;
 }
 
 .discounted-price {
-    font-size: 24px;
-    font-weight: bold;
-    color: #00A364;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #00A365;
     margin-top: 5px;
     display: block;
 }
 
 .price {
-    font-size: 24px;
+    font-size: 2.2rem;
+    font-weight: 600;
 }
 
 #prevBtn, #nextBtn {
@@ -299,7 +305,81 @@
 .heart.active .hover-img {
     opacity: 0;
 }
-        `;
+@media screen and (max-width: 1200px) {
+    .products-wrapper {
+        width: calc(290px * 3);
+    }
+    #prevBtn, #nextBtn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .products-wrapper {
+        width: calc(290px * 2);
+    }
+    #prevBtn, #nextBtn {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    #ebebek-carousel h1 {
+        font-size: 2.2rem;
+        padding: 20px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .products-wrapper {
+        width: calc(290px * 1);
+    }
+    .product-card {
+        min-width: 240px;
+        min-height: 450px;
+    }
+    .add-to-cart {
+        font-size: 14px;
+        height: 40px;
+    }
+    .heart {
+        width: 35px;
+        height: 35px;
+    }
+    .heart img {
+        width: 20px;
+        height: 20px;
+    }
+    #prevBtn, #nextBtn {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    #ebebek-carousel {
+        max-width: 100%;
+        border-radius: 20px;
+    }
+    #ebebek-carousel h1 {
+        font-size: 1.8rem;
+        padding: 15px;
+        text-align: center;
+    }
+    .products-wrapper {
+        width: 100%;
+    }
+    .product-card {
+        width: 90%;
+        min-width: 200px;
+    }
+    #prevBtn, #nextBtn {
+        display: none;
+    }
+}    
+`;
     const styleTag = document.createElement("style");
     styleTag.innerHTML = css;
     document.head.appendChild(styleTag);
@@ -402,42 +482,41 @@
     addCarouselFunctionality();
   };
 
-  
   const addHeartFunctionality = () => {
     const hearts = document.querySelectorAll(".heart");
-    const storedFavorites =
-      JSON.parse(localStorage.getItem("favoriteProducts")) || [];
+    const storedFavorites = getFavoritesFromLocalStorage(); // ID listesi olarak alıyoruz
 
     hearts.forEach((heart) => {
-      const productName = heart
-        .closest(".product-card")
-        .querySelector("h3").textContent;
+        const productCard = heart.closest(".product-card");
+        if (!productCard) return;  
 
-      
-      if (storedFavorites.includes(productName)) {
-        heart.classList.add("active");
-      }
+        const productId = productCard.getAttribute("data-id"); // ID'yi alıyoruz
+        if (!productId) return;
 
-      heart.addEventListener("click", () => {
-        heart.classList.toggle("active");
-        let updatedFavorites =
-          JSON.parse(localStorage.getItem("favoriteProducts")) || [];
-
-        if (heart.classList.contains("active")) {
-          updatedFavorites.push(productName);
-        } else {
-          updatedFavorites = updatedFavorites.filter(
-            (item) => item !== productName
-          );
+        // Eğer ürün ID'si favorilerde varsa kalbi aktif hale getir
+        if (storedFavorites.includes(productId)) {
+            heart.classList.add("active");
         }
 
-        localStorage.setItem(
-          "favoriteProducts",
-          JSON.stringify(updatedFavorites)
-        );
-      });
+        heart.addEventListener("click", () => {
+            heart.classList.toggle("active");
+            let updatedFavorites = getFavoritesFromLocalStorage();
+
+            if (heart.classList.contains("active")) {
+                // Eğer favoriye ekleniyorsa ID'yi listeye ekle
+                if (!updatedFavorites.includes(productId)) {
+                    updatedFavorites.push(productId);
+                }
+            } else {
+                // Favorilerden çıkar
+                updatedFavorites = updatedFavorites.filter(id => id !== productId);
+            }
+
+            saveFavoritesToLocalStorage(updatedFavorites); // Local storage'a kaydet
+        });
     });
-  };
+};
+
   const addCarouselFunctionality = () => {
     const track = document.querySelector(".products-track");
     const prevBtn = document.getElementById("prevBtn");
