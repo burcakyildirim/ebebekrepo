@@ -484,16 +484,16 @@
 
   const addHeartFunctionality = () => {
     const hearts = document.querySelectorAll(".heart");
-    const storedFavorites = getFavoritesFromLocalStorage(); // ID listesi olarak alıyoruz
+    const storedFavorites = getFavoritesFromLocalStorage();
 
     hearts.forEach((heart) => {
         const productCard = heart.closest(".product-card");
         if (!productCard) return;  
 
-        const productId = productCard.getAttribute("data-id"); // ID'yi alıyoruz
+        const productId = productCard.getAttribute("data-id"); 
         if (!productId) return;
 
-        // Eğer ürün ID'si favorilerde varsa kalbi aktif hale getir
+
         if (storedFavorites.includes(productId)) {
             heart.classList.add("active");
         }
@@ -503,16 +503,16 @@
             let updatedFavorites = getFavoritesFromLocalStorage();
 
             if (heart.classList.contains("active")) {
-                // Eğer favoriye ekleniyorsa ID'yi listeye ekle
+                
                 if (!updatedFavorites.includes(productId)) {
                     updatedFavorites.push(productId);
                 }
             } else {
-                // Favorilerden çıkar
+                
                 updatedFavorites = updatedFavorites.filter(id => id !== productId);
             }
 
-            saveFavoritesToLocalStorage(updatedFavorites); // Local storage'a kaydet
+            saveFavoritesToLocalStorage(updatedFavorites); 
         });
     });
 };
